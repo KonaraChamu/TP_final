@@ -64,8 +64,8 @@ const handleLogin = async (req, res) => {
 };
 
 const handleNewUser = async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
+  const { username, password, role } = req.body;
+  if (!username || !password || !role)
     res.status(400).json({ message: "Username and password are required." });
 
   const q = query(userDB, where("username", "==", username));
@@ -78,7 +78,7 @@ const handleNewUser = async (req, res) => {
     //store the new user
     // CLIENT role is default and the current implementation
     // Other role should be added mannually
-    const newUser = { username: username, password: hashedPwd, role: "CLIENT" };
+    const newUser = { username: username, password: hashedPwd, role };
     await addDoc(userDB, newUser);
     res.status(201).json({ success: `New user ${username} created!` });
   } catch (error) {
