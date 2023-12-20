@@ -17,6 +17,9 @@ import {
   Container,
   Center,
   useToast,
+  Stack,
+  RadioGroup,
+  Radio,
 } from '@chakra-ui/react';
 import { EmailIcon, LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
@@ -34,6 +37,7 @@ const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [show, setShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [role, setRole] = useState('CLIENT');
   const [email, setEmail] = useState({
     value: '',
     isTouched: false,
@@ -68,8 +72,8 @@ const AuthForm = () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-  const signUp = (username, password) =>
-    axios.post('auth/signup', JSON.stringify({ username, password }), {
+  const signUp = (username, password, role) =>
+    axios.post('auth/signup', JSON.stringify({ username, password, role }), {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: false,
     });
@@ -79,7 +83,7 @@ const AuthForm = () => {
     setIsLoading(true);
     try {
       if (isSignUp) {
-        await signUp(email.value, password.value);
+        await signUp(email.value, password.value, role);
         clearForm();
         setIsSignUp(false);
       } else {
@@ -170,25 +174,33 @@ const AuthForm = () => {
                 </InputRightElement>
               </InputGroup>
               {isSignUp && (
-                <InputGroup size="lg">
-                  <InputLeftAddon>
-                    <LockIcon />
-                  </InputLeftAddon>
-                  <Input
-                    pr="4.5rem"
-                    type={show ? 'text' : 'password'}
-                    placeholder="Confirm password"
-                    value={confirmPassword.value}
-                    onChange={(e) => setConfirmPassword({ ...confirmPassword, value: e.target.value })}
-                    onBlur={() => setConfirmPassword({ ...confirmPassword, isTouched: true })}
-                    isInvalid={!validateConfirmPassword() && confirmPassword.isTouched}
-                  />
-                  <InputRightElement>
-                    <Button variant="ghost" onClick={handleClick}>
-                      {show ? <ViewOffIcon /> : <ViewIcon />}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
+                <>
+                  <InputGroup size="lg">
+                    <InputLeftAddon>
+                      <LockIcon />
+                    </InputLeftAddon>
+                    <Input
+                      pr="4.5rem"
+                      type={show ? 'text' : 'password'}
+                      placeholder="Confirm password"
+                      value={confirmPassword.value}
+                      onChange={(e) => setConfirmPassword({ ...confirmPassword, value: e.target.value })}
+                      onBlur={() => setConfirmPassword({ ...confirmPassword, isTouched: true })}
+                      isInvalid={!validateConfirmPassword() && confirmPassword.isTouched}
+                    />
+                    <InputRightElement>
+                      <Button variant="ghost" onClick={handleClick}>
+                        {show ? <ViewOffIcon /> : <ViewIcon />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                  <RadioGroup onChange={setRole} value={role}>
+                    <Stack direction="row">
+                      <Radio value="CLIENT">Client</Radio>
+                      <Radio value="CHEF">Chef</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </>
               )}
             </VStack>
             <CardFooter pl={0} pr={0}>
